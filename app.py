@@ -19,6 +19,7 @@ class User(db.Model):
 		self.password = password
 
 
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
 	""" Session control"""
