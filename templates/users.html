@@ -5,28 +5,18 @@
 
 {% block page_content %}
 
-<div class="page-header">
-    <h1>Hello, {{ current_user.username }}!</h1>
-    <h2> Create a poll? </h2>
-</div>
-
-{{ wtf.quick_form(form) }}
 
 <p>&nbsp;
-<!-- we could remove this one unless we want to show friend's activity somehow -->
 <div class="nav nav-tabs">
     <ul class="nav nav-tabs">
         <li>Users</li>
            </ul>
            <ul class="Ready">
               {% for otheruser in otherusers %}
-               <li> {{ otheruser.username }} is {{ otheruser.ready }}     </li>
-            
+               <li> <a href="user/{{ otheruser.username }}"> {{ otheruser.username }}</a></li>
                {% endfor %}
            </ul>
 
 </div>
-
-
 
 {% endblock %}
