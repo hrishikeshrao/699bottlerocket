@@ -147,13 +147,13 @@ def register():
 @app.route('/', methods=['GET', 'POST']) #define the route for <server>/
 @login_required
 def index(): #index function
-    form = CreatePollForm()
-    if form.validate_on_submit():
-            current_user.ready=form.ready.data
-            db.session.add(current_user)
-            flash('Level of excitement updated.')
+    poll=Polls.query.order_by(Polls.timestamp.desc()).all()
+#    if form.validate_on_submit():
+##            current_user.ready=form.ready.data
+#            db.session.add(current_user)
+#            flash('Level of excitement updated.')
     otherusers=User.query.all()
-    return render_template('index_follow.html', form=form, otherusers=otherusers)
+    return render_template('index_follow.html', polls=poll, otherusers=otherusers)
 
 @app.route('/funday', methods=['GET', 'POST']) #define the route for <server>/
 @login_required
