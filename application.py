@@ -16,7 +16,7 @@ from flask_sslify import SSLify
 #############################
 #basic application initialization
 basedir = os.path.abspath(os.path.dirname(__file__))
-application = app = Flask(__name__) #Pass the __name__ argument to the Flask application constructor
+application = app = Flask(__name__, template_folder='templates') #Pass the __name__ argument to the Flask application constructor
 
 #This is the config for the dev server + SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
@@ -98,6 +98,16 @@ class CreatePollForm(Form):
                 Required(), Length(1, 64)])
     anonymous = BooleanField('Anonymous'  )
     submit = SubmitField('Create')
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 
 #login route
@@ -121,7 +131,7 @@ def logout():
     return redirect(url_for('index'))
 
 #Route for registering a new user. Note - no password in model. Model will hash it.
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register/', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
