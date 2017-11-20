@@ -11,6 +11,7 @@ from wtforms import StringField, SubmitField, SelectField, BooleanField, Passwor
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sslify import SSLify
+from datetime import timedelta
 #############################
 ##          Config         ##
 #############################
@@ -147,27 +148,28 @@ def register():
 @app.route('/', methods=['GET', 'POST']) #define the route for <server>/
 @login_required
 def index(): #index function
-    poll=Polls.query.order_by(Polls.timestamp.desc()).all()
+    last_day =  datetime.today() - timedelta(days=-1)
+    poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
 #    if form.validate_on_submit():
 ##            current_user.ready=form.ready.data
 #            db.session.add(current_user)
 #            flash('Level of excitement updated.')
     otherusers=User.query.all()
-    return render_template('index_follow.html', polls=poll, otherusers=otherusers)
+    return render_template('index_ng.html', polls=poll, otherusers=otherusers)
 
-@app.route('/funday', methods=['GET', 'POST']) #define the route for <server>/
-@login_required
-def funday(): #index function
-    form = FundayForm()
-    if form.validate_on_submit():
-            newfunday=Funday(title=form.title.data, thing1=form.thing1.data, thing2=form.thing2.data, thing3=form.thing3.data, thing4=form.thing4.data, thing5=form.thing5.data, author=current_user._get_current_object())
-            db.session.add(newfunday)
-            flash('Epic Sunday Funday Created. Create another?')
-            return redirect(url_for('funday'))
-    otherusers=User.query.all()
-    return render_template('index.html', form=form)
+#@app.route('/funday', methods=['GET', 'POST']) #define the route for <server>/
+#@login_required
+#def funday(): #index function
+#    form = FundayForm()
+#    if form.validate_on_submit():
+#            newfunday=Funday(title=form.title.data, thing1=form.thing1.data, thing2=form.thing2.data, thing3=form.thing3.data, thing4=form.thing4.data, thing5=form.thing5.data, author=current_user._get_current_object())
+#            db.session.add(newfunday)
+#            flash('Epic Sunday Funday Created. Create another?')
+#            return redirect(url_for('funday'))
+#    otherusers=User.query.all()
+#    return render_template('index.html', form=form)
 
-@app.route('/create_poll/', methods=['GET', 'POST']) #define the route for <server>/
+@app.route('/create_poll/', methods=['GET', 'POST']) #define the route for <server>/create_poll
 @login_required
 def createpoll(): #index function
     form = CreatePollForm()
@@ -178,11 +180,29 @@ def createpoll(): #index function
             return redirect(url_for('createpoll'))
 #    otherusers=User.query.all()
     return render_template('index.html', form=form)
-@app.route('/showpoll', methods=['GET']) #define the route for <server>/
+
+
+
+
+
+
+@app.route('/showpoll', methods=['GET']) #define the route for <server>/showpoll
 @login_required
-def showpoll(): #index function
-    poll=Polls.query.order_by(Polls.timestamp.desc()).all()
+def showpoll(): #showpoll function
+    last_day =  datetime.today() - timedelta(days=-1)
+    poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     return render_template('show.html', polls=poll)
+
+@app.route('/showpoll_ng', methods=['GET']) #define the route for <server>/showpoll
+@login_required
+def showpoll2(): #showpoll function
+    last_day =  datetime.today() - timedelta(days=-1)
+    poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
+    return jsonify({'polls':[e.serialize() for e in poll]})
+
+
+
+
 
 
 @app.route('/show', methods=['GET']) #define the route for <server>/
@@ -282,6 +302,14 @@ class Polls(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     
+    def serialize(self):
+        return {
+            'id': self.id, 
+            'title': self.title,
+            'option1': self.option1,
+            'option2':self.option2,
+            'author_id':self.author_id,
+        }
     
     
 #user class - includes the UserMixin from flash.ext.login to help with password hashing, etc.
