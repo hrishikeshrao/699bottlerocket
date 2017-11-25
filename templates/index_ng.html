@@ -1,16 +1,35 @@
-<html>
-<!-- Angular stuff goes to this template-->
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
+  <script src="/static/app.js"></script>
+</head>
 
-<script>
-</script>
-<H1>This is the template for Angular stuff</H1>
-<p> use /showpoll_ng to get json version of all the list of polls.
-/create_poll and repaning URLs are still directed to the Jinja version of the template...<br>
-/register to create a new user<br>
-/login to login<br>
-<br>
-I will create more URLs later in the week and make updates as we work on the teplates! 
-<br>
-/(url name)_ng seems to be a decent teplate to follow for the API URL for all the pages
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
-</html>
+{% block title %}694 App - Register{% endblock %}
+
+{% block page_content %}
+{% raw %}
+<div ng-app="app">
+  <div ng-controller="feed" ng-cloak>
+    <div class="row">
+      <div class="col-sm-3" ng-repeat="poll in feed.polls">
+        <div class="panel panel-default">
+          <header class="panel-heading">
+            <span>{{poll.title}}</span>
+          </header>
+          <div class="panel-body">
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control">{{poll.option1}}</button>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control">{{poll.option2}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endraw %}
+{% endblock %}
