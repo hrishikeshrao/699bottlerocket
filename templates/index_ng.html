@@ -1,0 +1,35 @@
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
+  <script src="/static/app.js"></script>
+</head>
+
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}694 App - Register{% endblock %}
+
+{% block page_content %}
+{% raw %}
+<div ng-app="app">
+  <div ng-controller="feed" ng-cloak>
+    <div class="row">
+      <div class="col-sm-3" ng-repeat="poll in feed.polls">
+        <div class="panel panel-default">
+          <header class="panel-heading">
+            <span>{{poll.title}}</span>
+          </header>
+          <div class="panel-body">
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control">{{poll.option1}}</button>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control">{{poll.option2}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endraw %}
+{% endblock %}
