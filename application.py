@@ -1,17 +1,20 @@
 #get everything imported and set up
 from datetime import datetime
-from flask import Flask, jsonify, render_template, flash, url_for, request, redirect #import Flask, Jinja2 rendering
+from flask import Flask, jsonify, render_template, flash, url_for, request, redirect,abort #import Flask, Jinja2 rendering
 from flask_bootstrap import Bootstrap #import bootstrap - don't forget to pip install flask-bootstrap first
 from flask_script import Manager #import flask-script
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import wtforms_json
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, SelectField, BooleanField, PasswordField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sslify import SSLify
 from datetime import timedelta
+from werkzeug.datastructures import CombinedMultiDict, MultiDict
+wtforms_json.init()
 #############################
 ##          Config         ##
 #############################
@@ -99,6 +102,8 @@ class CreatePollForm(Form):
                 Required(), Length(1, 64)])
     anonymous = BooleanField('Anonymous'  )
     submit = SubmitField('Create')
+
+
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
@@ -181,7 +186,14 @@ def createpoll(): #index function
 #    otherusers=User.query.all()
     return render_template('index.html', form=form)
 
-
+@app.route('/create_poll_ng/', methods=['POST'])
+#@login_required
+def createpoll2():
+    data = MultiDict(mapping=request.json)
+    form = CreatePollForm.from_json(data) 
+    newPoll=Polls(title=form.title.data, option1=form.option1.data, option2=form.option2.data, anonymous=form.anonymous.data,author=current_user._get_current_object())
+    db.session.add(newPoll)
+    return jsonify(data={'message': 'Success '})
 
 
 
@@ -199,9 +211,6 @@ def showpoll2(): #showpoll function
     last_day =  datetime.today() - timedelta(days=-1)
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     return jsonify({'polls':[e.serialize() for e in poll]})
-
-
-
 
 
 
