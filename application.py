@@ -1,17 +1,20 @@
 #get everything imported and set up
 from datetime import datetime
-from flask import Flask, jsonify, render_template, flash, url_for, request, redirect #import Flask, Jinja2 rendering
+from flask import Flask, jsonify, render_template, flash, url_for, request, redirect,abort #import Flask, Jinja2 rendering
 from flask_bootstrap import Bootstrap #import bootstrap - don't forget to pip install flask-bootstrap first
 from flask_script import Manager #import flask-script
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import wtforms_json
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, SelectField, BooleanField, PasswordField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sslify import SSLify
 from datetime import timedelta
+from werkzeug.datastructures import CombinedMultiDict, MultiDict
+wtforms_json.init()
 #############################
 ##          Config         ##
 #############################
@@ -21,7 +24,7 @@ application = app = Flask(__name__, template_folder='templates') #Pass the __nam
 
 #This is the config for the dev server + SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 #This is the config for MySQL + Beanstalk
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + os.environ['RDS_USERNAME'] + ':' + os.environ['RDS_PASSWORD'] + '@' + os.environ['RDS_HOSTNAME'] + ':' + os.environ['RDS_PORT'] + '/' + os.environ['RDS_DB_NAME']
 
@@ -99,6 +102,8 @@ class CreatePollForm(Form):
                 Required(), Length(1, 64)])
     anonymous = BooleanField('Anonymous'  )
     submit = SubmitField('Create')
+
+
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
@@ -181,10 +186,22 @@ def createpoll(): #index function
 #    otherusers=User.query.all()
     return render_template('index.html', form=form)
 
+@app.route('/create_poll_ng/', methods=['POST'])
+@login_required
+def createpoll2():
+    data = MultiDict(mapping=request.json)
+    form = CreatePollForm.from_json(data) 
+    newPoll=Polls(title=form.title.data, option1=form.option1.data, option2=form.option2.data, anonymous=form.anonymous.data,author=current_user._get_current_object())
+    db.session.add(newPoll)
+    return jsonify(data={'message': "1"})
 
-
-
-
+@app.route('/vote_ng/', methods=['POST'])
+@login_required
+def votepolls():
+    data = MultiDict(mapping=request.json)
+    newvote = Votes(author=current_user._get_current_object(),poll_id=data["poll_id"],option = data["option"])
+    db.session.add(newvote)
+    return jsonify(data={'message': "1"})
 
 @app.route('/showpoll', methods=['GET']) #define the route for <server>/showpoll
 @login_required
@@ -193,15 +210,14 @@ def showpoll(): #showpoll function
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     return render_template('show.html', polls=poll)
 
-@app.route('/showpoll_ng', methods=['GET']) #define the route for <server>/showpoll
+@app.route('/showpoll_ng/', methods=['GET']) #define the route for <server>/showpoll
 @login_required
 def showpoll2(): #showpoll function
     last_day =  datetime.today() - timedelta(days=-1)
+    user = current_user._get_current_object()
+    voted = Votes.query.filter(Votes.author_id == user.id).all()
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
-    return jsonify({'polls':[e.serialize() for e in poll]})
-
-
-
+    return jsonify({'polls':[e.serialize() for e in poll],'voted':voted})
 
 
 
@@ -310,6 +326,13 @@ class Polls(db.Model):
             'option2':self.option2,
             'author_id':self.author_id,
         }
+ 
+class Votes(db.Model):
+    __tablename__ = "votes"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    poll_id = db.Column(db.Integer, db.ForeignKey('polls.id'))
+    option =  db.Column(db.Boolean)
     
     
 #user class - includes the UserMixin from flash.ext.login to help with password hashing, etc.
