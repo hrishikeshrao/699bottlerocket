@@ -24,7 +24,7 @@ application = app = Flask(__name__, template_folder='templates') #Pass the __nam
 
 #This is the config for the dev server + SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 #This is the config for MySQL + Beanstalk
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + os.environ['RDS_USERNAME'] + ':' + os.environ['RDS_PASSWORD'] + '@' + os.environ['RDS_HOSTNAME'] + ':' + os.environ['RDS_PORT'] + '/' + os.environ['RDS_DB_NAME']
 
@@ -187,16 +187,21 @@ def createpoll(): #index function
     return render_template('index.html', form=form)
 
 @app.route('/create_poll_ng/', methods=['POST'])
-#@login_required
+@login_required
 def createpoll2():
     data = MultiDict(mapping=request.json)
     form = CreatePollForm.from_json(data) 
     newPoll=Polls(title=form.title.data, option1=form.option1.data, option2=form.option2.data, anonymous=form.anonymous.data,author=current_user._get_current_object())
     db.session.add(newPoll)
-    return jsonify(data={'message': 'Success '})
+    return jsonify(data={'message': "1"})
 
-
-
+@app.route('/vote_ng/', methods=['POST'])
+@login_required
+def votepolls():
+    data = MultiDict(mapping=request.json)
+    newvote = Votes(author=current_user._get_current_object(),poll_id=data["poll_id"],option = data["option"])
+    db.session.add(newvote)
+    return jsonify(data={'message': "1"})
 
 @app.route('/showpoll', methods=['GET']) #define the route for <server>/showpoll
 @login_required
@@ -205,12 +210,14 @@ def showpoll(): #showpoll function
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     return render_template('show.html', polls=poll)
 
-@app.route('/showpoll_ng', methods=['GET']) #define the route for <server>/showpoll
+@app.route('/showpoll_ng/', methods=['GET']) #define the route for <server>/showpoll
 @login_required
 def showpoll2(): #showpoll function
     last_day =  datetime.today() - timedelta(days=-1)
+    user = current_user._get_current_object()
+    voted = Votes.query.filter(Votes.author_id == user.id).all()
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
-    return jsonify({'polls':[e.serialize() for e in poll]})
+    return jsonify({'polls':[e.serialize() for e in poll],'voted':voted})
 
 
 
@@ -319,6 +326,13 @@ class Polls(db.Model):
             'option2':self.option2,
             'author_id':self.author_id,
         }
+ 
+class Votes(db.Model):
+    __tablename__ = "votes"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    poll_id = db.Column(db.Integer, db.ForeignKey('polls.id'))
+    option =  db.Column(db.Boolean)
     
     
 #user class - includes the UserMixin from flash.ext.login to help with password hashing, etc.
