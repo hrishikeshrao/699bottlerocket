@@ -1,15 +1,32 @@
 {% extends "bootstrap/base.html" %}
+{% block title %}A||B{% endblock title %}
+{% block head %}
+  {{ super() }}
+  {% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="/static/css/styles.css">
+  {% endblock styles %}
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+{% endblock head %}
 
-{% block title %}694 App{% endblock %}
 {% block navbar %}
-  <div class="navbar navbar-default" role="navigation">
+  <nav class="navbar">
     <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/">This or That app!</a>
+      <ul class="nav navbar-nav">
+        <li><a href="/">[Logo]</a></li>
+        {% if current_user.is_authenticated %}
+        <li><a role="button" data-toggle="modal" data-target="#modal-create-poll">Ask</a></li>
+        {% else %}
+        <li><a href="{{ url_for('login') }}">Ask</a></li>
+        {% endif %}
+      </ul>
+        <!-- <div class="navbar-header">
+          <a class="navbar-brand" href="/">[Logo]</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/"> Home</a></li>
+                <li><a href="/">Home</a></li>
             </ul>
             <ul class="nav navbar-nav">
                 <li><a href="/users">Users</a></li>
@@ -17,7 +34,7 @@
             <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('showpoll') }}">Show Polls</a></li>
             </ul>
-            </ul>
+            </>
             <ul class="nav navbar-nav">
                 <li><a href="/create_poll">Create Poll</a></li>
             </ul>
@@ -28,11 +45,38 @@
                 <li><a href="{{ url_for('login') }}">Log In</a></li>
                 {% endif %}
             </ul>
-        </div>
-
+        </div> -->
       </div>
-    </div>
+    </nav>
+
+{% raw %}
+<section class="modal fade" id="modal-create-poll" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <header class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">New poll</h4>
+      </header>
+      <div class="modal-body">
+        <form name="newPoll">
+          <div class="form-group">
+            <label for="question" class="control-label">Question</label>
+            <input name="question" id="question" ng-model="question" type="text" class="form-control">
+          </div>
+          <p>{{question}}</p>
+        </form>
+        <p>One fine body&hellip;</p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </footer>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</section><!-- /.modal -->
+{% endraw %}
 {% endblock %}
+
 
 {% block content %}
 <div class="container">
@@ -46,3 +90,6 @@
   {% block page_content %}blah{% endblock %}
 </div>
 {% endblock %}
+{% block scripts %}
+  {{ super() }}
+{% endblock scripts %}
