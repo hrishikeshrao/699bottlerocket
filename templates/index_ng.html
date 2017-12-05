@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block page_content %}
+{% block content %}
 {% raw %}
-<div ng-app="app">
   <div ng-controller="feed" ng-cloak>
     <div class="row">
       <div class="col-sm-3" ng-repeat="poll in feed.polls">
@@ -23,6 +22,5 @@
       </div>
     </div>
   </div>
-</div>
 {% endraw %}
-{% endblock %}
+{% endblock content %}
