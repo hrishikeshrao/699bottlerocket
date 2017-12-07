@@ -219,7 +219,13 @@ def showpoll2(): #showpoll function
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     return jsonify({'polls':[e.serialize() for e in poll],'voted':voted})
 
-
+@app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
+@login_required
+def mypoll():
+    user = current_user._get_current_object()
+    polls =Polls.query.filter(Polls.author_id == user.id).all()
+    for poll in polls:
+        votes.append(Votes.query.filter(Votes.poll_id == poll.id).all())
 
 @app.route('/show', methods=['GET']) #define the route for <server>/
 @login_required
