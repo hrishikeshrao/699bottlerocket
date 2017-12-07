@@ -25,15 +25,6 @@ application = app = Flask(__name__, template_folder='templates') #Pass the __nam
 #This is the config for the dev server + SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-#This is the config for MySQL + Beanstalk
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + os.environ['RDS_USERNAME'] + ':' + os.environ['RDS_PASSWORD'] + '@' + os.environ['RDS_HOSTNAME'] + ':' + os.environ['RDS_PORT'] + '/' + os.environ['RDS_DB_NAME']
-
-#driver = 'mysql+pymysql://'
-#application.debug=True
-#app.config['SQLALCHEMY_DATABASE_URI'] = driver \
-#                                        + os.environ['RDS_USERNAME'] + ':' + os.environ['RDS_PASSWORD'] \
-#                                        +'@' + os.environ['RDS_HOSTNAME']  +  ':' + os.environ['RDS_PORT'] \
-#                                        + '/' + os.environ['RDS_DB_NAME']
 
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SECRET_KEY'] = 'you_should_really_have_this_be_an_environment_variable'
@@ -78,20 +69,6 @@ class RegistrationForm(Form):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('Email taken')
-class FundayForm(Form):
-    title = StringField('Title', validators=[
-        Required(), Length(1, 64)])
-    thing1 = StringField('Fun Thing 1', validators=[
-        Required(), Length(1, 64)])
-    thing2 = StringField('Fun Thing 2', validators=[
-                Required(), Length(1, 64)])
-    thing3 = StringField('Fun Thing 3', validators=[
-        Required(), Length(1, 64)])
-    thing4 = StringField('Fun Thing 4', validators=[
-        Required(), Length(1, 64)])
-    thing5 = StringField('Fun Thing 5', validators=[
-            Required(), Length(1, 64)])
-    submit = SubmitField('Create')
 
 class CreatePollForm(Form):
     title = StringField('Title', validators=[
@@ -162,30 +139,6 @@ def index(): #index function
     otherusers=User.query.all()
     return render_template('index_ng.html', polls=poll, otherusers=otherusers)
 
-#@app.route('/funday', methods=['GET', 'POST']) #define the route for <server>/
-#@login_required
-#def funday(): #index function
-#    form = FundayForm()
-#    if form.validate_on_submit():
-#            newfunday=Funday(title=form.title.data, thing1=form.thing1.data, thing2=form.thing2.data, thing3=form.thing3.data, thing4=form.thing4.data, thing5=form.thing5.data, author=current_user._get_current_object())
-#            db.session.add(newfunday)
-#            flash('Epic Sunday Funday Created. Create another?')
-#            return redirect(url_for('funday'))
-#    otherusers=User.query.all()
-#    return render_template('index.html', form=form)
-
-@app.route('/create_poll/', methods=['GET', 'POST']) #define the route for <server>/create_poll
-@login_required
-def createpoll(): #index function
-    form = CreatePollForm()
-    if form.validate_on_submit():
-            newPoll=Polls(title=form.title.data, option1=form.option1.data, option2=form.option2.data, anonymous=form.anonymous.data, author=current_user._get_current_object())
-            db.session.add(newPoll)
-            flash('Epic Sunday Funday Created. Create another?')
-            return redirect(url_for('createpoll'))
-#    otherusers=User.query.all()
-    return render_template('index.html', form=form)
-
 @app.route('/create_poll_ng/', methods=['POST'])
 @login_required
 def createpoll2():
@@ -204,16 +157,10 @@ def votepolls():
     data = MultiDict(mapping=request.json)
     newvote = Votes(author=current_user._get_current_object(),poll_id=data["poll_id"],option = data["option"])
     db.session.add(newvote)
+    flash('Poll created')
     resp = jsonify(data)
     resp.status_code = 201
     return resp
-
-@app.route('/showpoll', methods=['GET']) #define the route for <server>/showpoll
-@login_required
-def showpoll(): #showpoll function
-    last_day =  datetime.today() - timedelta(days=-1)
-    poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
-    return render_template('show.html', polls=poll)
 
 @app.route('/showpoll_ng/', methods=['GET']) #define the route for <server>/showpoll
 @login_required
@@ -222,21 +169,37 @@ def showpoll2(): #showpoll function
     user = current_user._get_current_object()
     voted = Votes.query.filter(Votes.author_id == user.id).all()
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
-    return jsonify({'polls':[e.serialize() for e in poll],'voted':voted})
+    votes=[]
+    for poll_obj in poll:
+        vote_objects = Votes.query.filter(Votes.poll_id == poll_obj.id).all()
+        op1_count = 0
+        op2_count = 0
+        for element in vote_objects:
+            if (element.option):
+                op1_count +=1
+            else:
+                op2_count +=1
+        votes.append([op1_count,op2_count])
+    return jsonify({'polls':[e.serialize() for e in poll],'vote_count':votes,'if_voted':voted})
 
 @app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
 @login_required
 def mypoll():
     user = current_user._get_current_object()
     polls =Polls.query.filter(Polls.author_id == user.id).all()
+    votes=[]
     for poll in polls:
-        votes.append(Votes.query.filter(Votes.poll_id == poll.id).all())
+        vote_objects = Votes.query.filter(Votes.poll_id == poll.id).all()
+        op1_count = 0
+        op2_count = 0
+        for element in vote_objects:
+            if (element.option):
+                op1_count +=1
+            else:
+                op2_count +=1
+        votes.append([op1_count,op2_count])
+    return jsonify({'polls':[e.serialize() for e in polls],'vote_count':votes})
 
-@app.route('/show', methods=['GET']) #define the route for <server>/
-@login_required
-def show(): #index function
-    fundays=Funday.query.order_by(Funday.timestamp.desc()).all()
-    return render_template('show.html', fundays=fundays)
 
 
 @app.route('/follow/<username>')
@@ -307,18 +270,6 @@ class Follow(db.Model):
                             primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-class Funday(db.Model):
-    __tablename__ = 'fundays'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.Text)
-    thing1 = db.Column(db.Text)
-    thing2 = db.Column(db.Text)
-    thing3 = db.Column(db.Text)
-    thing4 = db.Column(db.Text)
-    thing5 = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
 class Polls(db.Model):
     __polls__='polls'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -353,10 +304,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    posts = db.relationship('Funday',
-                               foreign_keys=[Funday.author_id],
-                               backref=db.backref('author', lazy='joined'),
-                               lazy='dynamic')
     polls = db.relationship('Polls',
                                foreign_keys=[Polls.author_id],
                                backref=db.backref('author', lazy='joined'),
