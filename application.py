@@ -197,7 +197,7 @@ def showpoll2(): #showpoll function
     return jsonify({'polls':combined})
 
 @app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
-#@login_required
+@login_required
 def mypoll():
     user = current_user._get_current_object()
     poll =Polls.query.filter(Polls.author_id == user.id).all()
