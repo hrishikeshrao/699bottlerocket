@@ -141,7 +141,6 @@ def votepolls():
     data = MultiDict(mapping=request.json)
     newvote = Votes(author_id=current_user._get_current_object().id,poll_id=data["poll_id"],option = data["option"])
     db.session.add(newvote)
-    flash('Poll created')
     resp = jsonify(data)
     resp.status_code = 201
     return resp
