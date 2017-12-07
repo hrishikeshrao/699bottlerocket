@@ -1,0 +1,12 @@
+<nav class="navbar">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li><a href="/">[Logo]</a></li>
+      {% if current_user.is_authenticated %}
+      <li><a role="button" data-toggle="modal" data-target="#modal-create-poll">Ask</a></li>
+      {% else %}
+      <li><a href="{{ url_for('login') }}">Ask</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

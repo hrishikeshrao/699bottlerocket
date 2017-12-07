@@ -1,6 +1,6 @@
 #get everything imported and set up
 from datetime import datetime
-from flask import Flask, jsonify, render_template, flash, url_for, request, redirect,abort #import Flask, Jinja2 rendering
+from flask import Flask, jsonify, render_template, flash, url_for, request, redirect, abort, make_response #import Flask, Jinja2 rendering
 from flask_bootstrap import Bootstrap #import bootstrap - don't forget to pip install flask-bootstrap first
 from flask_script import Manager #import flask-script
 from flask_sqlalchemy import SQLAlchemy
@@ -190,10 +190,13 @@ def createpoll(): #index function
 @login_required
 def createpoll2():
     data = MultiDict(mapping=request.json)
-    form = CreatePollForm.from_json(data) 
+    form = CreatePollForm.from_json(data)
     newPoll=Polls(title=form.title.data, option1=form.option1.data, option2=form.option2.data, anonymous=form.anonymous.data,author=current_user._get_current_object())
     db.session.add(newPoll)
-    return jsonify(data={'message': "1"})
+    flash('Poll created')
+    resp = jsonify(data)
+    resp.status_code = 201
+    return resp
 
 @app.route('/vote_ng/', methods=['POST'])
 @login_required
@@ -323,24 +326,24 @@ class Polls(db.Model):
     anonymous = db.Column(db.Boolean)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    
+
     def serialize(self):
         return {
-            'id': self.id, 
+            'id': self.id,
             'title': self.title,
             'option1': self.option1,
             'option2':self.option2,
             'author_id':self.author_id,
         }
- 
+
 class Votes(db.Model):
     __tablename__ = "votes"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     poll_id = db.Column(db.Integer, db.ForeignKey('polls.id'))
     option =  db.Column(db.Boolean)
-    
-    
+
+
 #user class - includes the UserMixin from flash.ext.login to help with password hashing, etc.
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

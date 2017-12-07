@@ -1,48 +1,37 @@
 {% extends "bootstrap/base.html" %}
+{% block title %}A||B{% endblock title %}
+{% block head %}
+  {{ super() }}
+  {% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+  {% endblock styles %}
+  {% block scripts %}
+    <script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}" defer></script>
+    <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}" defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js" defer></script>
+    <script src="/static/app.js" defer></script>
+  {% endblock scripts %}
+{% endblock head %}
 
-{% block title %}694 App{% endblock %}
-{% block navbar %}
-  <div class="navbar navbar-default" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/">This or That app!</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/"> Home</a></li>
-            </ul>
-            <ul class="nav navbar-nav">
-                <li><a href="/users">Users</a></li>
-            </ul>
-            <ul class="nav navbar-nav">
-                <li><a href="{{ url_for('showpoll') }}">Show Polls</a></li>
-            </ul>
-            </ul>
-            <ul class="nav navbar-nav">
-                <li><a href="/create_poll">Create Poll</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('logout') }}">Log Out</a></li>
-                {% else %}
-                <li><a href="{{ url_for('login') }}">Log In</a></li>
-                {% endif %}
-            </ul>
-        </div>
-
-      </div>
-    </div>
-{% endblock %}
-
-{% block content %}
-<div class="container">
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message }}
-    </div>
-    {% endfor %}
-<div class="container">
-  {% block page_content %}blah{% endblock %}
-</div>
-{% endblock %}
+{% block body_attribs %} ng-app="AorB"{% endblock body_attribs %}
+{% block body %}
+  {% include 'modal.create-poll.html' %}
+  {% include 'notifications.html' %}
+  <header>
+  {% block header %}
+    {% block navbar %}
+      {% include 'nav.top.html' %}
+    {% endblock navbar %}
+  {% endblock header %}
+  </header>
+  <main>
+    {% block content %}
+    {% endblock content %}
+  </main>
+  <footer>
+    {% block footer %}
+    {% endblock footer %}
+  </footer>
+{% endblock body %}
