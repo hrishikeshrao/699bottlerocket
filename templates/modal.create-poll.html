@@ -3,25 +3,25 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form name="form" ng-submit="createPoll(form)" novalidate>
-        <header class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Let's get some opinions!</h4>
+        <header class="modal-header bg-primary">
+          <h4 class="modal-title text-light">Let's get some opinions!</h4>
+          <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </header>
         <div class="modal-body">
-          <div class="form-group" ng-class="{'has-success': form.title.$valid, 'has-error': form.$submitted && form.title.$error.required}">
+          <div class="form-group">
             <label for="title" class="control-label">Question</label>
-            <input name="title" id="title" ng-model="newPoll.title" type="text" class="form-control" placeholder="Google Photos or Flickr?" maxlength="280" required>
-            <span ng-show="form.title.$error.required && form.$submitted" class="help-block">Oops! You forgot to enter a question!</span>
+            <input name="title" id="title" ng-model="newPoll.title" type="text" class="form-control" ng-class="{'is-valid': form.title.$valid, 'is-invalid': form.$submitted && form.title.$error.required}" placeholder="Google Photos or Flickr?" maxlength="280" required>
+            <div class="invalid-feedback">Oops! You forgot to enter a question!</div>
           </div>
-          <div class="form-group" ng-class="{'has-success': form.option1.$valid, 'has-error': form.$submitted && form.option1.$error.required}">
+          <div class="form-group">
             <label for="option1" class="control-label">Choice A</label>
-            <input name="option1" id="option1" ng-model="newPoll.option1" type="text" class="form-control" placeholder="Google Photos" maxlength="50" required>
-            <span ng-show="form.option1.$error.required && form.$submitted" class="help-block">Enter choice A.</span>
+            <input name="option1" id="option1" ng-model="newPoll.option1" type="text" class="form-control" ng-class="{'is-valid': form.option1.$valid, 'is-invalid': form.$submitted && form.option1.$error.required}" placeholder="Google Photos" maxlength="50" required>
+            <div class="invalid-feedback">Enter choice A.</div>
           </div>
-          <div class="form-group" ng-class="{'has-success': form.option2.$valid, 'has-error': form.$submitted && form.option2.$error.required}">
+          <div class="form-group">
             <label for="option2" class="control-label">Choice B</label>
-            <input name="option2" id="option2" ng-model="newPoll.option2" type="text" class="form-control" placeholder="Flickr" maxlength="50" required>
-            <span ng-show="form.option2.$error.required && form.$submitted" class="help-block">Enter choice B.</span>
+            <input name="option2" id="option2" ng-model="newPoll.option2" type="text" class="form-control" ng-class="{'is-valid': form.option2.$valid, 'is-invalid': form.$submitted && form.option2.$error.required}" placeholder="Flickr" maxlength="50" required>
+            <div class="invalid-feedback">Enter choice B.</div>
           </div>
           <div class="checkbox">
             <label class="control-label">
