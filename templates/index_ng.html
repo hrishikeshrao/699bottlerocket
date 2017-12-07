@@ -3,24 +3,29 @@
 
 {% block content %}
 {% raw %}
-  <div ng-controller="feed" ng-cloak>
-    <div class="row">
-      <div class="col-sm-3" ng-repeat="poll in feed.polls">
-        <div class="panel panel-default">
-          <header class="panel-heading">
-            <span>{{poll.title}}</span>
-          </header>
-          <div class="panel-body">
-            <div class="form-group">
-              <button type="button" class="btn btn-primary form-control">{{poll.option1}}</button>
-            </div>
-            <div class="form-group">
-              <button type="button" class="btn btn-primary form-control">{{poll.option2}}</button>
-            </div>
+<div ng-controller="feed" ng-cloak>
+  <div class="row">
+    <div class="col-sm-6 col-md-4" ng-repeat="poll in feed.polls">
+      <div class="card">
+        <div class="card-body">
+        <header class="card-block">
+          <div class="d-flex">
+            <span class="fa fa-2x fa-user text-muted"></span>
+            <h6 class="card-title">{{poll.title}}</h6>
           </div>
+          <span>
+        </header>
+        <div class="card-block d-flex">
+          <button type="button" class="btn btn-light">{{poll.option1}}</button>
+          <button type="button" class="btn btn-light">{{poll.option2}}</button>
+        </div>
+        <footer class="card-block">
+
+        </footer>
         </div>
       </div>
     </div>
   </div>
+</div>
 {% endraw %}
 {% endblock content %}
