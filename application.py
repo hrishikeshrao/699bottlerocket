@@ -163,12 +163,9 @@ def showpoll2(): #showpoll function
         op1_count = 0
         op2_count = 0
         for element in vote_objects:
-            if (element.author_id == user.id):
-                vote_boolean = True
-            if (element.option):
-                op1_count +=1
-            else:
-                op2_count +=1
+            if (element.author_id == user.id):vote_boolean = True
+            if (element.option):op1_count +=1
+            else:op2_count +=1
         percent1 = 0
         percent2 = 0
         try:percent1 = op1_count*100/float(op1_count+op2_count)
@@ -209,12 +206,9 @@ def mypoll():
         op1_count = 0
         op2_count = 0
         for element in vote_objects:
-            if (element.author_id == user.id):
-                vote_boolean = True
-            if (element.option):
-                op1_count +=1
-            else:
-                op2_count +=1
+            if (element.author_id == user.id):vote_boolean = True
+            if (element.option):op1_count +=1
+            else:op2_count +=1
         percent1 = 0
         percent2 = 0
         try:percent1 = op1_count*100/float(op1_count+op2_count)
