@@ -1,0 +1,32 @@
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(12deg, #FF6F00 0%, #FFA000 65%, #FC7E01 100%);
+  background-size: cover;
+  background-attachment: fixed;
+  padding: 60px 0;
+}
+
+.header, .footer {
+  height: 60px;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+}
+
+.header {
+  top: 0;
+}
+
+.footer {
+  bottom: 0;
+}
+
+main {
+  overflow-y: scroll;
+}

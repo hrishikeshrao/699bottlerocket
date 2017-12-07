@@ -193,7 +193,6 @@ def createpoll2():
     form = CreatePollForm.from_json(data)
     newPoll=Polls(title=form.title.data, option1=form.option1.data, option2=form.option2.data, anonymous=form.anonymous.data,author=current_user._get_current_object())
     db.session.add(newPoll)
-    flash('Poll created')
     resp = jsonify(data)
     resp.status_code = 201
     return resp
