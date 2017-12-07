@@ -172,12 +172,10 @@ def showpoll2(): #showpoll function
                 op2_count +=1
         percent1 = 0
         percent2 = 0
-        try:
-            percent1 = op1_count*100/float(op1_count+op2_count)
-            percent2 = op2_count*100/float(op1_count+op2_count)
-        except:
-            percent1 = 0
-            percent2 = 0
+        try:percent1 = op1_count*100/float(op1_count+op2_count)
+        except:percent1 = 0
+        try:percent2 = op2_count*100/float(op1_count+op2_count)
+        except:percent2 = 0
         votes.append([percent1,percent2])
         voted.append(vote_boolean)
         total_votes.append(op1_count+op2_count)
@@ -220,12 +218,10 @@ def mypoll():
                 op2_count +=1
         percent1 = 0
         percent2 = 0
-        try:
-            percent1 = op1_count*100/float(op1_count+op2_count)
-            percent2 = op2_count*100/float(op1_count+op2_count)
-        except:
-            percent1 = 0
-            percent2 = 0
+        try:percent1 = op1_count*100/float(op1_count+op2_count)
+        except:percent1 = 0
+        try:percent2 = op2_count*100/float(op1_count+op2_count)
+        except:percent2 = 0
         votes.append([percent1,percent2])
         voted.append(vote_boolean)
         total_votes.append(op1_count+op2_count)
