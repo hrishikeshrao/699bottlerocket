@@ -167,11 +167,12 @@ def showpoll2(): #showpoll function
         percent2 = 0
         try:
             percent1 = op1_count*100/float(op1_count+op2_count)
-            oercent2 = op2_count*100/float(op1_count+op2_count)
+            percent2 = op2_count*100/float(op1_count+op2_count)
         except:
-            pass
+            percent1 = 0
+            percent2 = 0
         votes.append([percent1,percent2])
-    return jsonify({'polls':[e.serialize() for e in poll],'vote_count':votes,'if_voted':voted})
+    return jsonify({'polls':[e.serialize() for e in poll],'vote_count':votes})
 
 @app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
 @login_required
