@@ -197,22 +197,52 @@ def showpoll2(): #showpoll function
     return jsonify({'polls':combined})
 
 @app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
-@login_required
+#@login_required
 def mypoll():
     user = current_user._get_current_object()
-    polls =Polls.query.filter(Polls.author_id == user.id).all()
+    poll =Polls.query.filter(Polls.author_id == user.id).all()
     votes=[]
-    for poll in polls:
-        vote_objects = Votes.query.filter(Votes.poll_id == poll.id).all()
+    voted = []
+    total_votes = []
+    total_1= []
+    total_2 = []
+    for poll_obj in poll:
+        vote_objects = Votes.query.filter(Votes.poll_id == poll_obj.id).all()
+        vote_boolean = False
         op1_count = 0
         op2_count = 0
         for element in vote_objects:
+            if (element.author_id == user.id):
+                vote_boolean = True
             if (element.option):
                 op1_count +=1
             else:
                 op2_count +=1
-        votes.append([op1_count,op2_count])    
-    return jsonify({'polls':[e.serialize() for e in polls],'vote_count':votes})
+        percent1 = 0
+        percent2 = 0
+        try:
+            percent1 = op1_count*100/float(op1_count+op2_count)
+            percent2 = op2_count*100/float(op1_count+op2_count)
+        except:
+            percent1 = 0
+            percent2 = 0
+        votes.append([percent1,percent2])
+        voted.append(vote_boolean)
+        total_votes.append(op1_count+op2_count)
+        total_1.append(op1_count)
+        total_2.append(op2_count)
+    poll_serialized = [e.serialize() for e in poll]
+    combined=[]
+    for i in range (0,len(poll)):
+        poll_serialized[i]["percent1"] =votes[i][0]
+        poll_serialized[i]["percent2"] =votes[i][1]
+        poll_serialized[i]["voted_flag"] =voted[i]
+        poll_serialized[i]["total_votes"] =total_votes[i]
+        poll_serialized[i]["total_1"] =total_1[i]
+        poll_serialized[i]["total_2"] =total_2[i]
+        
+        combined.append(poll_serialized[i])
+    return jsonify({'polls':combined})
 
 
 
