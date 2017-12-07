@@ -120,10 +120,6 @@ def register():
 def index(): #index function
     last_day =  datetime.today() - timedelta(days=-1)
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
-#    if form.validate_on_submit():
-##            current_user.ready=form.ready.data
-#            db.session.add(current_user)
-#            flash('Level of excitement updated.')
     otherusers=User.query.all()
     return render_template('index_ng.html', polls=poll, otherusers=otherusers)
 
@@ -143,7 +139,7 @@ def createpoll2():
 @login_required
 def votepolls():
     data = MultiDict(mapping=request.json)
-    newvote = Votes(author=current_user._get_current_object(),poll_id=data["poll_id"],option = data["option"])
+    newvote = Votes(author_id=current_user._get_current_object().id,poll_id=data["poll_id"],option = data["option"])
     db.session.add(newvote)
     flash('Poll created')
     resp = jsonify(data)
@@ -167,7 +163,14 @@ def showpoll2(): #showpoll function
                 op1_count +=1
             else:
                 op2_count +=1
-        votes.append([op1_count,op2_count])
+        percent1 = 0
+        percent2 = 0
+        try:
+            percent1 = op1_count*100/float(op1_count+op2_count)
+            oercent2 = op2_count*100/float(op1_count+op2_count)
+        except:
+            pass
+        votes.append([percent1,percent2])
     return jsonify({'polls':[e.serialize() for e in poll],'vote_count':votes,'if_voted':voted})
 
 @app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
