@@ -155,6 +155,9 @@ def showpoll2(): #showpoll function
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     votes=[]
     voted = []
+    total_votes = []
+    total_1= []
+    total_2 = []
     for poll_obj in poll:
         vote_objects = Votes.query.filter(Votes.poll_id == poll_obj.id).all()
         vote_boolean = False
@@ -177,12 +180,18 @@ def showpoll2(): #showpoll function
             percent2 = 0
         votes.append([percent1,percent2])
         voted.append(vote_boolean)
+        total_votes.append(op1_count+op2_count)
+        total_1.append(op1_count)
+        total_2.append(op2_count)
     poll_serialized = [e.serialize() for e in poll]
     combined=[]
     for i in range (0,len(poll)):
         poll_serialized[i]["percent1"] =votes[i][0]
         poll_serialized[i]["percent2"] =votes[i][1]
         poll_serialized[i]["voted_flag"] =voted[i]
+        poll_serialized[i]["total_votes"] =total_votes[i]
+        poll_serialized[i]["total_1"] =total_1[i]
+        poll_serialized[i]["total_2"] =total_2[i]
         
         combined.append(poll_serialized[i])
     return jsonify({'polls':combined})
