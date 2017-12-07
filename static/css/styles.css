@@ -6393,4 +6393,13 @@ main {
 .x-small {
   font-size: x-small; }
 
+.poll {
+  margin-bottom: 10px; }
+
+.user-img {
+  margin-right: 10px; }
+
+.vote-btn-container__btn {
+  flex: 1; }
+
 /*# sourceMappingURL=styles.css.map */

@@ -1,0 +1,13 @@
+.poll {
+  margin-bottom: 10px;
+}
+
+.user-img {
+margin-right: 10px;
+}
+
+.vote-btn-container {
+  &__btn {
+    flex: 1;
+  }
+}

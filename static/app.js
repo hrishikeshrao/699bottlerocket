@@ -15,6 +15,15 @@ app.controller('feed', ['$scope', '$rootScope', 'pollsService', function($scope,
     $scope.update();
   });
 
+  $scope.vote = (poll, option) => {
+    var vote_data = {};
+    vote_data.poll_id = poll.id;
+    vote_data.option = option;
+    pollsService.vote(vote_data).then((response) => {
+      $scope.update();
+    });
+  };
+
   $scope.update();
 
 }]);
@@ -57,8 +66,14 @@ app.factory('pollsService', ['$http', function($http){
     .then((response) => response);
   }
 
+  function vote(data) {
+    return $http.post('/vote_ng/', data)
+    .then((response) => response);
+  }
+
   return {
     getPolls: getPolls,
-    createPoll: createPoll
+    createPoll: createPoll,
+    vote: vote
   };
 }]);

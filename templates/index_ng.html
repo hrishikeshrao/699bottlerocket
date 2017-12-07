@@ -6,23 +6,30 @@
 <div ng-controller="feed" ng-cloak>
   <div class="row">
     <div class="col-sm-6 col-md-4" ng-repeat="poll in feed.polls">
-      <div class="card">
-        <div class="card-body">
-        <header class="card-block">
-          <div class="d-flex">
-            <span class="fa fa-2x fa-user text-muted"></span>
+      <div class="card poll">
+        <header class="card-header">
+          <div class="d-flex align-items-baseline">
+            <span class="fa fa-2x fa-user text-muted user-img"></span>
             <h6 class="card-title">{{poll.title}}</h6>
+          </div>
+          <div class="d-flex justify-content-between text-muted">
+            <span class="x-small">{{poll.total_votes}} votes</span>
+            <span class="x-small">0 likes</span>
+            <span class="x-small">0 comments</span>
           </div>
           <span>
         </header>
-        <div class="card-block d-flex">
-          <button type="button" class="btn btn-light">{{poll.option1}}</button>
-          <button type="button" class="btn btn-light">{{poll.option2}}</button>
+        <div class="card-body">
+          <div class="card-block d-flex align-items-stretch vote-btn-container">
+            <button ng-hide="poll.voted_flag" ng-click="vote(poll, true)" type="button" class="btn btn-light vote-btn-container__btn">{{poll.option1}}</button>
+            <button ng-hide="poll.voted_flag" ng-click="vote(poll, false)" type="button" class="btn btn-light vote-btn-container__btn">{{poll.option2}}</button>
+          </div>
         </div>
-        <footer class="card-block">
-
+        <footer class="card-footer d-flex justify-content-between text-muted">
+          <span class="x-small">Expires at 12:00, Dec. 23, 2017</span>
+          <span class="x-small">Like</span>
+          <span class="x-small">Share</span>
         </footer>
-        </div>
       </div>
     </div>
   </div>
