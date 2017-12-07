@@ -204,7 +204,10 @@ def votepolls():
     data = MultiDict(mapping=request.json)
     newvote = Votes(author=current_user._get_current_object(),poll_id=data["poll_id"],option = data["option"])
     db.session.add(newvote)
-    return jsonify(data={'message': "1"})
+    flash('Poll created')
+    resp = jsonify(data)
+    resp.status_code = 201
+    return resp
 
 @app.route('/showpoll', methods=['GET']) #define the route for <server>/showpoll
 @login_required
