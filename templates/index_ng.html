@@ -5,10 +5,15 @@
 {% raw %}
 <div ng-controller="feed" ng-cloak>
   <div class="row">
-    <div class="col-sm-4" ng-repeat="poll in feed.polls">
+    <div class="col-sm-6 col-md-4" ng-repeat="poll in feed.polls">
       <div class="card">
+        <div class="card-body">
         <header class="card-block">
-          <h6 class="card-title">{{poll.title}}</h6>
+          <div class="d-flex">
+            <span class="fa fa-2x fa-user text-muted"></span>
+            <h6 class="card-title">{{poll.title}}</h6>
+          </div>
+          <span>
         </header>
         <div class="card-block d-flex">
           <button type="button" class="btn btn-light">{{poll.option1}}</button>
@@ -17,6 +22,7 @@
         <footer class="card-block">
 
         </footer>
+        </div>
       </div>
     </div>
   </div>
