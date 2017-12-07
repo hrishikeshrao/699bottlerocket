@@ -7,6 +7,7 @@ app.controller('feed', ['$scope', '$rootScope', 'pollsService', function($scope,
   $scope.update = () => {
     pollsService.getPolls().then((response) => {
       $scope.feed = response.data;
+      console.log(response.data);
     });
   };
 

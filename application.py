@@ -154,8 +154,10 @@ def showpoll2(): #showpoll function
     voted = Votes.query.filter(Votes.author_id == user.id).all()
     poll=Polls.query.filter(Polls.timestamp < last_day).order_by(Polls.timestamp.desc()).all()
     votes=[]
+    voted = []
     for poll_obj in poll:
         vote_objects = Votes.query.filter(Votes.poll_id == poll_obj.id).all()
+        vote_boolean = Votes.query.filter(Votes.author_id)
         op1_count = 0
         op2_count = 0
         for element in vote_objects:
@@ -172,7 +174,13 @@ def showpoll2(): #showpoll function
             percent1 = 0
             percent2 = 0
         votes.append([percent1,percent2])
-    return jsonify({'polls':[e.serialize() for e in poll],'vote_count':votes})
+    poll_serialized = [e.serialize() for e in poll]
+    combined=[]
+    for i in range (0,len(poll)):
+        poll_serialized[i]["percent1"] =votes[i][0]
+        poll_serialized[i]["percent2"] =votes[i][1]
+        combined.append(poll_serialized[i])
+    return jsonify({'polls':combined})
 
 @app.route('/mypoll_ng/', methods=['GET']) #define the route for <server>/showpoll
 @login_required
@@ -189,7 +197,7 @@ def mypoll():
                 op1_count +=1
             else:
                 op2_count +=1
-        votes.append([op1_count,op2_count])
+        votes.append([op1_count,op2_count])    
     return jsonify({'polls':[e.serialize() for e in polls],'vote_count':votes})
 
 
