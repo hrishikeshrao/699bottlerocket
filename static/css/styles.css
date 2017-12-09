@@ -6391,11 +6391,15 @@ main {
 .footer__icon {
   margin: 5px; }
 
+body {
+  color: white; }
+
 .x-small {
   font-size: x-small; }
 
 .poll {
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  color: #343a40; }
 
 .user-img {
   margin-right: 10px; }
@@ -6404,5 +6408,7 @@ main {
   min-height: 100px; }
   .vote-btn-container__btn {
     flex: 1; }
+  .vote-btn-container .btn__text {
+    white-space: normal; }
 
 /*# sourceMappingURL=styles.css.map */

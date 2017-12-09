@@ -1,5 +1,6 @@
 .poll {
   margin-bottom: 10px;
+  color: $dark;
 }
 
 .user-img {
@@ -11,5 +12,9 @@ margin-right: 10px;
 
   &__btn {
     flex: 1;
+  }
+
+  .btn__text {
+    white-space: normal;
   }
 }
