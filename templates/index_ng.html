@@ -21,11 +21,11 @@
         </header>
         <div class="card-block d-flex align-items-stretch vote-btn-container">
           <button ng-disabled="poll.voted_flag" ng-click="vote(poll, true)" type="button" class="btn btn-light vote-btn-container__btn">
-            <span>{{poll.option1}}</span>
+            <span class="btn__text">{{poll.option1}}</span>
             <h3 ng-show="poll.voted_flag" class="display-4 text-primary">{{poll.percent1 | number:0}}%</h3>
           </button>
           <button ng-disabled="poll.voted_flag" ng-click="vote(poll, false)" type="button" class="btn btn-light vote-btn-container__btn">
-            <span>{{poll.option2}}</span>
+            <span class="btn__text">{{poll.option2}}</span>
             <h3 ng-show="poll.voted_flag" class="display-4 text-primary">{{poll.percent2 | number:0}}%</h3>
           </button>
         </div>
