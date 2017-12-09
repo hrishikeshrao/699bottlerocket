@@ -1,8 +1,7 @@
 #get everything imported and set up
 from datetime import datetime
-from flask import Flask, jsonify, render_template, flash, url_for, request, redirect, abort, make_response #import Flask, Jinja2 rendering
+from flask import Flask, jsonify, render_template, flash, url_for, request, redirect #import Flask, Jinja2 rendering
 from flask_bootstrap import Bootstrap #import bootstrap - don't forget to pip install flask-bootstrap first
-from flask_script import Manager #import flask-script
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -11,9 +10,8 @@ from flask_wtf import Form
 from wtforms import StringField, SubmitField, SelectField, BooleanField, PasswordField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_sslify import SSLify
 from datetime import timedelta
-from werkzeug.datastructures import CombinedMultiDict, MultiDict
+from werkzeug.datastructures import MultiDict
 wtforms_json.init()
 #############################
 ##          Config         ##
@@ -235,53 +233,6 @@ def mypoll():
 
 
 
-@app.route('/follow/<username>')
-@login_required
-def follow(username):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash('Invalid user.')
-        return redirect(url_for('index'))
-    if current_user.is_following(user):
-        flash('You are already following this person.')
-        return redirect(url_for('index'))
-    current_user.follow(user)
-    flash('You are now following %s.' % username)
-    return redirect(url_for('index'))
-
-@app.route('/unfollow/<username>')
-@login_required
-def unfollow(username):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash('Invalid user.')
-        return redirect(url_for('index'))
-    if not current_user.is_following(user):
-        flash('You are not following this person.')
-        return redirect(url_for('.user', username=username))
-    current_user.unfollow(user)
-    flash('You are not following %s anymore.' % username)
-    return redirect(url_for('index'))
-
-
-#api route
-@app.route('/api/users')
-def get_users():
-    apiusers=User.query.all() #get all users
-    return jsonify({ 'users' : [apiuser.to_json() for apiuser in apiusers]}) #return JSON of all users
-
-@app.route('/users')
-@login_required
-def users():
-    otherusers=User.query.all()
-    return render_template('users.html', otherusers=otherusers)
-
-@app.route('/user/<name>')
-@login_required
-def user(name):
-    existinguser=User.query.filter_by(username=name).first()
-    return render_template('user.html', existinguser=existinguser)
-    #return render_template('hello_bootstrap.html', name=name)
 
 #route for creating a new database
 @app.route('/db/create_db')
@@ -294,14 +245,6 @@ def create_db():
 def drop_db():
     db.drop_all()
     return '<h1>Database Cleared</h1>'
-
-class Follow(db.Model):
-    __tablename__ = 'follows'
-    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                            primary_key=True)
-    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                            primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Polls(db.Model):
     __polls__='polls'
@@ -341,22 +284,7 @@ class User(UserMixin, db.Model):
                                foreign_keys=[Polls.author_id],
                                backref=db.backref('author', lazy='joined'),
                                lazy='dynamic')
-    ready = db.Column(db.String(64), nullable=True)
-    followed = db.relationship('Follow',
-                               foreign_keys=[Follow.follower_id],
-                               backref=db.backref('follower', lazy='joined'),
-                               lazy='dynamic',
-                               cascade='all, delete-orphan')
-    followers = db.relationship('Follow',
-                                foreign_keys=[Follow.followed_id],
-                                backref=db.backref('followed', lazy='joined'),
-                                lazy='dynamic',
-                                cascade='all, delete-orphan')
-
-    def follow(self, user):
-        if not self.is_following(user):
-            f = Follow(follower=self, followed=user)
-            db.session.add(f)
+    ready = db.Column(db.String(64), nullable=True)    
 
     def unfollow(self, user):
         f = self.followed.filter_by(followed_id=user.id).first()
